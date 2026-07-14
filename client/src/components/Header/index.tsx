@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
+import { navigationMenu, LOGO_TEXT, HINT_TEXT } from '../../data'
 
 interface HeaderProps {
 	onLogoHover: (isHovered: boolean) => void
 }
 
 export const Header: React.FC<HeaderProps> = ({ onLogoHover }) => {
-	// Стан для показу рукописної підказки "hover me"
 	const [showHint, setShowHint] = useState<boolean>(true)
 
 	const handleMouseEnter = () => {
@@ -15,6 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ onLogoHover }) => {
 
 	const handleMouseLeave = () => {
 		onLogoHover(false)
+		setShowHint(true)
 	}
 
 	return (
@@ -22,16 +23,15 @@ export const Header: React.FC<HeaderProps> = ({ onLogoHover }) => {
 			<div className='max-w-7xl mx-auto px-6 py-4 flex items-center justify-between gap-4'>
 				{/* LOGO AREA WITH CONTAINER FOR HINT ALIGNMENT */}
 				<div className='relative py-2 flex items-center'>
-					{/* MAIN LOGO TRIGGER */}
 					<a
 						href='/'
 						onMouseEnter={handleMouseEnter}
 						onMouseLeave={handleMouseLeave}
-						className='flex items-center gap-3 group cursor-pointer z-30'
+						className='inline-flex items-center gap-3 group cursor-pointer z-30'
 					>
+						{/* LOGO ICON */}
 						<div className='relative'>
 							<div className='absolute inset-0 bg-amber-400/40 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500'></div>
-
 							<svg
 								xmlns='http://www.w3.org/2000/svg'
 								viewBox='0 0 24 24'
@@ -58,15 +58,16 @@ export const Header: React.FC<HeaderProps> = ({ onLogoHover }) => {
 								<path d='M11 10.5l1-1.5 1 1.5' />
 							</svg>
 						</div>
+						{/* DYNAMIC LOGO TEXT */}
 						<span className='text-xl font-extrabold tracking-wider text-white'>
-							LOONARI{' '}
+							{LOGO_TEXT.main}{' '}
 							<span className='text-amber-400 font-light transition-colors duration-300 group-hover:text-white'>
-								CREATOR & SHOP
+								{LOGO_TEXT.sub}
 							</span>
 						</span>
 					</a>
 
-					{/* HANDWRITTEN HOVER ME HINT (Рендериться лише якщо showHint === true) */}
+					{/* HANDWRITTEN HOVER ME HINT */}
 					{showHint && (
 						<div className='absolute left-[6px] top-[34px] flex items-center gap-1.5 pointer-events-none transition-all duration-500 ease-out opacity-75 origin-top-left animate-drift-under'>
 							<svg
@@ -80,61 +81,43 @@ export const Header: React.FC<HeaderProps> = ({ onLogoHover }) => {
 								<path d='M 13 5 L 8 4 L 7 9' />
 							</svg>
 							<span className='font-handwritten text-[13px] tracking-wide text-amber-400/90 select-none transform translate-y-0.5 italic'>
-								hover me
+								{HINT_TEXT}
 							</span>
 						</div>
 					)}
 				</div>
 
-				{/* HEADER NAVIGATION BUTTONS / LINKS */}
-				<div className='flex items-center gap-4 z-20'>
-					<a
-						href='#shop'
-						className='group px-4 py-2 text-sm font-medium text-white/80 hover:text-amber-400 transition-all duration-300 flex items-center gap-2'
-					>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							fill='none'
-							viewBox='0 0 24 24'
-							strokeWidth='1.5'
-							stroke='currentColor'
-							className='w-4 h-4 transition-transform duration-300 group-hover:-translate-y-0.5'
-						>
-							<path
-								strokeLinecap='round'
-								strokeLinejoin='round'
-								d='M15.75 10.5V6a3.75 3.75 0 1,0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0,1-1.12-1.243l1.264-12A1.125 1.125 0 0,1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Zm7.5 0a.375.375 0 1,1-.75 0 .375.375 0 0,1 .75 0Z'
-							/>
-						</svg>
-						Visit Shop
-					</a>
+				{/* SEMANTIC NAVIGATION SYSTEM FOR SEO */}
+				<nav className='z-20'>
+					<ul className='flex items-center gap-4'>
+						{navigationMenu.map((item) => {
+							// Base styles for all links
+							const baseClass =
+								'text-sm font-medium transition-all duration-300 active:scale-95 text-center'
 
-					<a
-						href='#creator'
-						className='group/navbtn px-5 py-2 text-sm font-semibold bg-amber-400 text-neutral-950 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:scale-105 hover:bg-amber-300 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] transition-all duration-300 active:scale-95 inline-flex items-center gap-2.5'
-					>
-						<svg
-							xmlns='http://www.w3.org/2000/svg'
-							viewBox='0 0 24 24'
-							fill='none'
-							stroke='currentColor'
-							stroke-width='2.5'
-							class='w-4 h-4 transition-all duration-300 group-hover/navbtn:rotate-45'
-						>
-							<line x1='4' y1='12' x2='20' y2='12' stroke-linecap='round' />
-							<line x1='12' y1='4' x2='12' y2='20' stroke-linecap='round' />
-							<circle cx='12' cy='12' r='2' fill='currentColor' />
-						</svg>
-						Start Project
-					</a>
+							// Dynamic selection of styles depending on button type (variant)
+							const variants = {
+								link: 'group px-4 py-2 text-white/80 hover:text-amber-400 flex items-center gap-2',
+								button:
+									'group/navbtn px-5 py-2 font-semibold bg-amber-400 text-neutral-950 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:scale-105 hover:bg-amber-300 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] inline-flex items-center gap-2.5',
+								outline:
+									'px-5 py-2 border border-white/20 rounded-full hover:bg-amber-400 hover:text-neutral-950 hover:border-amber-400 inline-block',
+							}
 
-					<a
-						href='#login'
-						className='px-5 py-2 text-sm font-medium border border-white/20 rounded-full hover:bg-amber-400 hover:text-neutral-950 hover:border-amber-400 transition-all duration-300 active:scale-95 inline-block text-center'
-					>
-						Login
-					</a>
-				</div>
+							return (
+								<li key={item.id}>
+									<a
+										href={item.href}
+										className={`${baseClass} ${variants[item.variant]}`}
+									>
+										{item.icon && item.icon}
+										{item.label}
+									</a>
+								</li>
+							)
+						})}
+					</ul>
+				</nav>
 			</div>
 		</header>
 	)

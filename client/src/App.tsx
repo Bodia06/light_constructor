@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Header } from './components' // Імпортуємо через глобальний index.ts
+import { Header } from './components/Header'
 
 function App() {
 	// Стан, який контролює, чи наведено курсор на логотип
