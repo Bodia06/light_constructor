@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Header } from './components/Header'
+import bgImage from './assets/images/bg-body.avif'
 
 function App() {
-	// Стан, який контролює, чи наведено курсор на логотип
+	// State that controls whether the cursor is hovering over the logo
 	const [isLogoHovered, setIsLogoHovered] = useState<boolean>(false)
 
 	return (
@@ -10,7 +11,7 @@ function App() {
 			{/* ========================================================================= */}
 			{/* FIXED AMBIENT LIGHTING BLOCKS */}
 			{/* ========================================================================= */}
-			{/* Класи прозорості та зсуву змінюються динамічно на основі стану isLogoHovered */}
+			{/* Transparency and offset classes change dynamically based on the isLogoHovered state */}
 			<div
 				className={`fixed top-0 bottom-0 -left-[20%] w-[40%] rounded-r-full blur-[160px] z-10 pointer-events-none transition-all duration-700 ease-out ${
 					isLogoHovered ? 'bg-amber-400/15 translate-x-[12%]' : 'bg-amber-400/0'
@@ -23,12 +24,11 @@ function App() {
 						: 'bg-amber-400/0'
 				}`}
 			/>
-			{/* ========================================================================= */}
 
 			{/* 1. DARK BACKGROUND IMAGE WITH OVERLAY */}
 			<div className='fixed inset-0 z-0'>
 				<img
-					src='https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1920&q=80'
+					src={bgImage}
 					alt='Modern dark interior'
 					className='w-full h-full object-cover'
 				/>
@@ -36,7 +36,7 @@ function App() {
 			</div>
 
 			{/* 2. STICKY HEADER */}
-			{/* Передаємо функцію зміни стану як пропс */}
+			{/* Passing the state change function as props */}
 			<Header onLogoHover={setIsLogoHovered} />
 
 			{/* 3. MAIN CONTENT AREA */}
