@@ -1,0 +1,23 @@
+{
+	"include": ["src/**/*"],
+	"exclude": ["src/node_modules", "dist"],
+	"compilerOptions": {
+		"target": "ES2022",
+		"module": "commonjs",
+
+		"moduleDetection": "force",
+		"esModuleInterop": true,
+
+		"rootDir": "./src",
+		"outDir": "./dist",
+
+		"strict": true,
+		"types": ["node"],
+
+		"skipLibCheck": true,
+		"sourceMap": true,
+
+		"noUnusedLocals": true,
+		"noUnusedParameters": true
+	}
+}
