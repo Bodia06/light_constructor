@@ -6,10 +6,15 @@ type Timetamps = 'createdAt' | 'updatedAt'
 
 type SystemFields = 'id' | Timetamps
 
-export type UserGoodDTO = Omit<Attributes<Good>, Timetamps>
+export type GoodResponseDTO = Omit<Attributes<Good>, Timetamps>
+
+export type GetGoodByIdDTO = Pick<Attributes<Good>, 'id'>
 
 export type CreateGoodDTO = Omit<CreationAttributes<Good>, SystemFields>
 
 export type UpdateGoodDTO = Partial<Omit<Attributes<Good>, SystemFields>>
 
-export type DeleteGoodDTO = Pick<Attributes<Good>, 'id'>
+export interface GoodQueryParams {
+  page: string
+  results: string
+}

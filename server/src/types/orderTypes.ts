@@ -8,8 +8,13 @@ type SystemFields = 'id' | Timetamps
 
 export type OrderResponseDTO = Omit<Attributes<Order>, Timetamps>
 
+export type GetOrderByIdDTO = Pick<Attributes<Order>, 'id'>
+
 export type CreateOrderDTO = Omit<CreationAttributes<Order>, SystemFields>
 
 export type UpdateOrderDTO = Partial<Omit<Attributes<Order>, SystemFields>>
 
-export type DeleteOrderDTO = Pick<Attributes<Order>, 'id'>
+export interface OrderQueryParams {
+  page: string
+  results: string
+}
