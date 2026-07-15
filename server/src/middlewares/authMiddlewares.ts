@@ -1,6 +1,7 @@
-import { verifyToken, TokenPayload } from '../utils/jwt'
+import { verifyToken } from '../utils/jwt'
 
 import type { Request, Response, NextFunction } from 'express'
+import type { tockenPayloads } from '../types'
 
 export interface RequestWithUser extends Request {
   user?: {
@@ -26,7 +27,7 @@ export const authenticateJWT = (
   const token = authHeader.split(' ')[1]
 
   try {
-    const decoded: TokenPayload = verifyToken(token)
+    const decoded: tockenPayloads.TokenPayload = verifyToken(token)
 
     req.user = {
       id: decoded.id,
