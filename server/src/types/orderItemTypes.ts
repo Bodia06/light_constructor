@@ -15,10 +15,6 @@ export type CrateOrderItemDTO = Omit<
   SystemFields
 >
 
-export type UpdateOrderItemDTO = Partial<
-  Omit<Attributes<OrderItem>, SystemFields>
->
-
 export interface OrderItemQueryParams {
   page: string
   results: string

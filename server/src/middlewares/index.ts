@@ -1,1 +1,5 @@
 export * as errorHandlers from './errorHandlers'
+export * as authMiddlewares from './authMiddlewares'
+export * as roleMiddlewares from './roleMiddlewares'
+export * as validationMiddlewares from './validationMiddleware'
+export * as cloudinaryMiddlewares from './cloudinaryMiddlewares'

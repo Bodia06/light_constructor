@@ -1,11 +1,13 @@
 import createHttpError from 'http-errors'
-import { CeilingSide } from '../database/models'
+import { CeilingSide, Ceiling } from '../database/models'
+import { authMiddlewares } from '../middlewares'
 
 import type { NextFunction, Request, Response } from 'express'
 import type { apiTypes, ceilingSideTypes } from '../types'
 
 export const getCeilingSides = async (
-  req: Request<{}, {}, {}, ceilingSideTypes.CeilingSideQueryParams>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, {}, ceilingSideTypes.CeilingSideQueryParams>,
   res: Response<
     apiTypes.ApiResponse<ceilingSideTypes.CeilingSideResponseDTO[]>
   >,
@@ -17,7 +19,21 @@ export const getCeilingSides = async (
   const offset = (Number(page) - 1) * Number(results)
 
   try {
+    const currentUserId = req.user?.id
+
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized. Please log in first.'))
+    }
+
     const foundCeilingSides = await CeilingSide.findAll({
+      include: [
+        {
+          model: Ceiling,
+          as: 'ceiling',
+          where: { userId: Number(currentUserId) },
+          attributes: []
+        }
+      ],
       limit,
       offset,
       order: ['id'],
@@ -37,17 +53,35 @@ export const getCeilingSides = async (
 }
 
 export const getCeilingSidesById = async (
-  req: Request<ceilingSideTypes.GetCeilingSideByIdDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<ceilingSideTypes.GetCeilingSideByIdDTO>,
   res: Response<apiTypes.ApiResponse<ceilingSideTypes.CeilingSideResponseDTO>>,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params
+    const currentUserId = req.user?.id
 
-    const foundCeilingSide = await CeilingSide.findByPk(Number(id))
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
+
+    const foundCeilingSide = await CeilingSide.findOne({
+      where: { id: Number(id) },
+      include: [
+        {
+          model: Ceiling,
+          as: 'ceiling',
+          where: { userId: Number(currentUserId) },
+          attributes: []
+        }
+      ]
+    })
 
     if (!foundCeilingSide) {
-      return next(createHttpError(404, 'Ceiling side not found'))
+      return next(
+        createHttpError(404, 'Ceiling side not found or access denied')
+      )
     }
 
     return res.status(200).send({
@@ -59,27 +93,47 @@ export const getCeilingSidesById = async (
 }
 
 export const createCeilingSide = async (
-  req: Request<{}, {}, ceilingSideTypes.CreateCeilingSideDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, ceilingSideTypes.CreateCeilingSideDTO>,
   res: Response<apiTypes.ApiResponse<ceilingSideTypes.CeilingSideResponseDTO>>,
   next: NextFunction
 ) => {
   try {
     const { body } = req
+    const currentUserId = req.user?.id
 
-    const createCeilingSide = await CeilingSide.create(body)
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
 
-    res.status(201).send({ data: createCeilingSide })
+    const userCeiling = await Ceiling.findOne({
+      where: {
+        id: body.ceilingId,
+        userId: Number(currentUserId)
+      }
+    })
+
+    if (!userCeiling) {
+      return next(
+        createHttpError(403, 'Forbidden. You cannot add sides to this ceiling.')
+      )
+    }
+
+    const createdCeilingSide = await CeilingSide.create(body)
+
+    res.status(201).send({ data: createdCeilingSide })
   } catch (err) {
     next(err)
   }
 }
 
 export const updateCeilingSide = async (
-  req: Request<
-    ceilingSideTypes.GetCeilingSideByIdDTO,
-    {},
-    ceilingSideTypes.CreateCeilingSideDTO
-  >,
+  req: authMiddlewares.RequestWithUser &
+    Request<
+      ceilingSideTypes.GetCeilingSideByIdDTO,
+      {},
+      ceilingSideTypes.CreateCeilingSideDTO
+    >,
   res: Response<apiTypes.ApiResponse<ceilingSideTypes.CeilingSideResponseDTO>>,
   next: NextFunction
 ) => {
@@ -89,23 +143,41 @@ export const updateCeilingSide = async (
   } = req
 
   try {
-    const [_, [updatedCeilingSide]] = await CeilingSide.update(body, {
-      where: { id: id },
-      returning: true
-    })
+    const currentUserId = req.user?.id
 
-    if (!updatedCeilingSide) {
-      return next(createHttpError(404, 'Ceiling side not found'))
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
     }
 
-    res.status(200).send({ data: updatedCeilingSide })
+    const foundCeilingSide = await CeilingSide.findOne({
+      where: { id: Number(id) },
+      include: [
+        {
+          model: Ceiling,
+          as: 'ceiling',
+          where: { userId: Number(currentUserId) },
+          attributes: []
+        }
+      ]
+    })
+
+    if (!foundCeilingSide) {
+      return next(
+        createHttpError(404, 'Ceiling side not found or access denied')
+      )
+    }
+
+    const updated = await foundCeilingSide.update(body)
+
+    res.status(200).send({ data: updated })
   } catch (err) {
     next(err)
   }
 }
 
 export const deleteCeilingSide = async (
-  req: Request<ceilingSideTypes.GetCeilingSideByIdDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<ceilingSideTypes.GetCeilingSideByIdDTO>,
   res: Response,
   next: NextFunction
 ) => {
@@ -114,13 +186,31 @@ export const deleteCeilingSide = async (
   } = req
 
   try {
-    const deletedCount = await CeilingSide.destroy({
-      where: { id: id }
+    const currentUserId = req.user?.id
+
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
+
+    const foundCeilingSide = await CeilingSide.findOne({
+      where: { id: Number(id) },
+      include: [
+        {
+          model: Ceiling,
+          as: 'ceiling',
+          where: { userId: Number(currentUserId) },
+          attributes: []
+        }
+      ]
     })
 
-    if (deletedCount === 0) {
-      return next(createHttpError(404, 'Ceiling side not found'))
+    if (!foundCeilingSide) {
+      return next(
+        createHttpError(404, 'Ceiling side not found or access denied')
+      )
     }
+
+    await foundCeilingSide.destroy()
 
     res.status(204).end()
   } catch (err) {

@@ -12,8 +12,6 @@ export type GetOrderByIdDTO = Pick<Attributes<Order>, 'id'>
 
 export type CreateOrderDTO = Omit<CreationAttributes<Order>, SystemFields>
 
-export type UpdateOrderDTO = Partial<Omit<Attributes<Order>, SystemFields>>
-
 export interface OrderQueryParams {
   page: string
   results: string

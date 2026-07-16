@@ -152,11 +152,6 @@ export const ORDER_SCHEM_CREATE: yup.ObjectSchema<orderTypes.CreateOrderDTO> =
       .required('User is required')
   })
 
-export const ORDER_SCHEM_UPDATE: yup.ObjectSchema<orderTypes.UpdateOrderDTO> =
-  yup.object({
-    userId: yup.number().typeError('User ID must be a number').integer()
-  })
-
 // ==========================================
 // ORDER ITEMS VALIDATION SCHEMAS
 // ==========================================
@@ -183,27 +178,6 @@ export const ORDER_ITEMS_SCHEM_CREATE: yup.ObjectSchema<orderItemTypes.CrateOrde
       .trim()
       .matches(/^\d+(\.\d{1,2})?$/, 'Invalid price format (e.g., 10.99)')
       .required('Price at purchase is required')
-  })
-
-export const ORDER_ITEMS_SCHEM_UPDATE: yup.ObjectSchema<orderItemTypes.UpdateOrderItemDTO> =
-  yup.object({
-    orderId: yup
-      .number()
-      .typeError('Order ID must be a number')
-      .integer('Order ID must be an integer'),
-    goodId: yup
-      .number()
-      .typeError('Good ID must be a number')
-      .integer('Good ID must be an integer'),
-    quantity: yup
-      .number()
-      .typeError('Quantity must be a number')
-      .integer('Quantity must be an integer')
-      .min(1, 'Quantity must be at least 1'),
-    priceAtPurchase: yup
-      .string()
-      .trim()
-      .matches(/^\d+(\.\d{1,2})?$/, 'Invalid price format (e.g., 10.99)')
   })
 
 // ==========================================

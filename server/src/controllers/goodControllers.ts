@@ -1,8 +1,8 @@
 import createHttpError from 'http-errors'
 import { Good } from '../database/models'
+import { authMiddlewares } from '../middlewares'
 
 import type { NextFunction, Request, Response } from 'express'
-import type { RequestWithUser } from '../middlewares/authMiddlewares'
 import type { apiTypes, goodTypes } from '../types'
 
 export const getGoods = async (
@@ -58,7 +58,8 @@ export const getGoodById = async (
 }
 
 export const createGood = async (
-  req: RequestWithUser & Request<{}, {}, goodTypes.CreateGoodDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, goodTypes.CreateGoodDTO>,
   res: Response<apiTypes.ApiResponse<goodTypes.GoodResponseDTO>>,
   next: NextFunction
 ) => {
@@ -74,7 +75,7 @@ export const createGood = async (
 }
 
 export const updateGood = async (
-  req: RequestWithUser &
+  req: authMiddlewares.RequestWithUser &
     Request<goodTypes.GetGoodByIdDTO, {}, goodTypes.UpdateGoodDTO>,
   res: Response<apiTypes.ApiResponse<goodTypes.GoodResponseDTO>>,
   next: NextFunction
@@ -101,7 +102,7 @@ export const updateGood = async (
 }
 
 export const deleteGood = async (
-  req: RequestWithUser & Request<goodTypes.GetGoodByIdDTO>,
+  req: authMiddlewares.RequestWithUser & Request<goodTypes.GetGoodByIdDTO>,
   res: Response,
   next: NextFunction
 ) => {

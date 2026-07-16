@@ -1,11 +1,14 @@
 import createHttpError from 'http-errors'
 import { User } from '../database/models'
+import { generateToken } from '../utils/jwt'
+import { authMiddlewares } from '../middlewares'
 
 import type { NextFunction, Request, Response } from 'express'
 import type { userTypes, apiTypes } from '../types'
 
 export const getUsers = async (
-  req: Request<{}, {}, {}, userTypes.UserQueryParams>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, {}, userTypes.UserQueryParams>,
   res: Response<apiTypes.ApiResponse<userTypes.UserResponseDTO[]>>,
   next: NextFunction
 ) => {
@@ -71,8 +74,58 @@ export const createUser = async (
   }
 }
 
+export const loginUser = async (
+  req: Request<{}, {}, userTypes.LoginUserDTO>,
+  res: Response<apiTypes.ApiResponse<userTypes.LoginResponseDTO>>,
+  next: NextFunction
+) => {
+  const { email, password } = req.body
+
+  try {
+    const foundUser = await User.findOne({
+      where: { email }
+    })
+
+    if (!foundUser) {
+      return next(createHttpError(401, 'Invalid email or password'))
+    }
+
+    const isPasswordCorrect = password === foundUser.password
+
+    if (!isPasswordCorrect) {
+      return next(createHttpError(401, 'Invalid email or password'))
+    }
+
+    const tokenPayload = {
+      id: foundUser.id.toString(),
+      email: foundUser.email,
+      role: foundUser.role
+    }
+
+    const token = generateToken(tokenPayload)
+
+    const userPlain = foundUser.get({ plain: true })
+    const {
+      password: _,
+      createdAt,
+      updatedAt,
+      ...userResponse
+    } = userPlain as any
+
+    res.status(200).send({
+      data: {
+        token,
+        user: userResponse as userTypes.UserResponseDTO
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 export const updateUser = async (
-  req: Request<userTypes.GetUserByIdDTO, {}, userTypes.UpdateUserDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<userTypes.GetUserByIdDTO, {}, userTypes.UpdateUserDTO>,
   res: Response<apiTypes.ApiResponse<userTypes.UserResponseDTO>>,
   next: NextFunction
 ) => {

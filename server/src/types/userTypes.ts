@@ -17,7 +17,14 @@ export type CreateUserDTO = Omit<CreationAttributes<User>, SystemFields>
 
 export type UpdateUserDTO = Partial<Omit<Attributes<User>, SystemFields>>
 
+export type LoginUserDTO = Pick<Attributes<User>, 'email' | 'password'>
+
 export interface UserQueryParams {
   page: string
   results: string
+}
+
+export interface LoginResponseDTO {
+  token: string
+  user: UserResponseDTO
 }

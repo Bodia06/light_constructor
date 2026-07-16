@@ -1,11 +1,13 @@
 import createHttpError from 'http-errors'
 import { Ceiling } from '../database/models'
+import { authMiddlewares } from '../middlewares'
 
 import type { NextFunction, Request, Response } from 'express'
 import type { apiTypes, ceilingTypes } from '../types'
 
 export const getCeilings = async (
-  req: Request<{}, {}, {}, ceilingTypes.CeilingQueryParams>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, {}, ceilingTypes.CeilingQueryParams>,
   res: Response<apiTypes.ApiResponse<ceilingTypes.CeilingResponseDTO[]>>,
   next: NextFunction
 ) => {
@@ -15,7 +17,16 @@ export const getCeilings = async (
   const offset = (Number(page) - 1) * Number(results)
 
   try {
+    const currentUserId = req.user?.id
+
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized. Please log in first.'))
+    }
+
     const foundCeilings = await Ceiling.findAll({
+      where: {
+        userId: Number(currentUserId)
+      },
       limit,
       offset,
       order: ['id'],
@@ -35,17 +46,32 @@ export const getCeilings = async (
 }
 
 export const getCeilingById = async (
-  req: Request<ceilingTypes.GetCeilingByIdDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<ceilingTypes.GetCeilingByIdDTO>,
   res: Response<apiTypes.ApiResponse<ceilingTypes.CeilingResponseDTO>>,
   next: NextFunction
 ) => {
   try {
     const { id } = req.params
+    const currentUserId = req.user?.id
+
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
 
     const foundCeiling = await Ceiling.findByPk(Number(id))
 
     if (!foundCeiling) {
       return next(createHttpError(404, 'Ceiling not found'))
+    }
+
+    if ((foundCeiling as any).userId !== Number(currentUserId)) {
+      return next(
+        createHttpError(
+          403,
+          'Forbidden. You do not have access to this ceiling.'
+        )
+      )
     }
 
     return res.status(200).send({
@@ -57,27 +83,34 @@ export const getCeilingById = async (
 }
 
 export const createCeiling = async (
-  req: Request<{}, {}, ceilingTypes.CreateCeilingDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<{}, {}, ceilingTypes.CreateCeilingDTO>,
   res: Response<apiTypes.ApiResponse<ceilingTypes.CeilingResponseDTO>>,
   next: NextFunction
 ) => {
   try {
-    const { body } = req
+    const currentUserId = req.user?.id
 
-    const createCeiling = await Ceiling.create(body)
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
 
-    res.status(201).send({ data: createCeiling })
+    const ceilingData = {
+      ...req.body,
+      userId: Number(currentUserId)
+    }
+
+    const createdCeiling = await Ceiling.create(ceilingData as any)
+
+    res.status(201).send({ data: createdCeiling })
   } catch (err) {
     next(err)
   }
 }
 
 export const updateCeiling = async (
-  req: Request<
-    ceilingTypes.GetCeilingByIdDTO,
-    {},
-    ceilingTypes.CreateCeilingDTO
-  >,
+  req: authMiddlewares.RequestWithUser &
+    Request<ceilingTypes.GetCeilingByIdDTO, {}, ceilingTypes.CreateCeilingDTO>,
   res: Response<apiTypes.ApiResponse<ceilingTypes.CeilingResponseDTO>>,
   next: NextFunction
 ) => {
@@ -87,14 +120,28 @@ export const updateCeiling = async (
   } = req
 
   try {
+    const currentUserId = req.user?.id
+
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
+
+    const foundCeiling = await Ceiling.findByPk(Number(id))
+
+    if (!foundCeiling) {
+      return next(createHttpError(404, 'Ceiling not found'))
+    }
+
+    if ((foundCeiling as any).userId !== Number(currentUserId)) {
+      return next(
+        createHttpError(403, 'Forbidden. You cannot update this ceiling.')
+      )
+    }
+
     const [_, [updatedCeiling]] = await Ceiling.update(body, {
       where: { id: id },
       returning: true
     })
-
-    if (!updatedCeiling) {
-      return next(createHttpError(404, 'Ceiling not found'))
-    }
 
     res.status(200).send({ data: updatedCeiling })
   } catch (err) {
@@ -103,7 +150,8 @@ export const updateCeiling = async (
 }
 
 export const deleteCeiling = async (
-  req: Request<ceilingTypes.GetCeilingByIdDTO>,
+  req: authMiddlewares.RequestWithUser &
+    Request<ceilingTypes.GetCeilingByIdDTO>,
   res: Response,
   next: NextFunction
 ) => {
@@ -112,13 +160,27 @@ export const deleteCeiling = async (
   } = req
 
   try {
-    const deletedCount = await Ceiling.destroy({
-      where: { id: id }
-    })
+    const currentUserId = req.user?.id
 
-    if (deletedCount === 0) {
+    if (!currentUserId) {
+      return next(createHttpError(401, 'Unauthorized.'))
+    }
+
+    const foundCeiling = await Ceiling.findByPk(Number(id))
+
+    if (!foundCeiling) {
       return next(createHttpError(404, 'Ceiling not found'))
     }
+
+    if ((foundCeiling as any).userId !== Number(currentUserId)) {
+      return next(
+        createHttpError(403, 'Forbidden. You cannot delete this ceiling.')
+      )
+    }
+
+    await Ceiling.destroy({
+      where: { id: id }
+    })
 
     res.status(204).end()
   } catch (err) {

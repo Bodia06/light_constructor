@@ -4,7 +4,7 @@ import { OrderItem } from '../database/models'
 import type { NextFunction, Request, Response } from 'express'
 import type { apiTypes, orderItemTypes } from '../types'
 
-export const getOrderItem = async (
+export const getOrderItems = async (
   req: Request<{}, {}, {}, orderItemTypes.OrderItemQueryParams>,
   res: Response<apiTypes.ApiResponse<orderItemTypes.OrderItemrResponseDTO[]>>,
   next: NextFunction
@@ -67,36 +67,6 @@ export const createOrderItem = async (
     const createOrderItem = await OrderItem.create(body)
 
     res.status(201).send({ data: createOrderItem })
-  } catch (err) {
-    next(err)
-  }
-}
-
-export const updateOrderItem = async (
-  req: Request<
-    orderItemTypes.GetOrderItemByIdDTO,
-    {},
-    orderItemTypes.CrateOrderItemDTO
-  >,
-  res: Response<apiTypes.ApiResponse<orderItemTypes.OrderItemrResponseDTO>>,
-  next: NextFunction
-) => {
-  const {
-    body,
-    params: { id }
-  } = req
-
-  try {
-    const [_, [updatedOrderItem]] = await OrderItem.update(body, {
-      where: { id: id },
-      returning: true
-    })
-
-    if (!updatedOrderItem) {
-      return next(createHttpError(404, 'Order item not found'))
-    }
-
-    res.status(200).send({ data: updatedOrderItem })
   } catch (err) {
     next(err)
   }
