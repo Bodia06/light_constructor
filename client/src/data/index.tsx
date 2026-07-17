@@ -42,15 +42,17 @@ export const navigationMenu: NavItem[] = [
 		icon: (
 			<svg
 				xmlns='http://www.w3.org/2000/svg'
-				viewBox='0 0 24 24'
 				fill='none'
+				viewBox='0 0 24 24'
+				strokeWidth='2'
 				stroke='currentColor'
-				strokeWidth='2.5'
-				className='w-4 h-4 transition-all duration-300 group-hover/navbtn:rotate-45'
+				className='w-5 h-5 transition-transform duration-300 group-hover/btn:-rotate-12 group-hover/btn:translate-x-0.5'
 			>
-				<line x1='4' y1='12' x2='20' y2='12' strokeLinecap='round' />
-				<line x1='12' y1='4' x2='12' y2='20' strokeLinecap='round' />
-				<circle cx='12' cy='12' r='2' fill='currentColor' />
+				<path
+					strokeLinecap='round'
+					strokeLinejoin='round'
+					d='M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125'
+				/>
 			</svg>
 		),
 	},

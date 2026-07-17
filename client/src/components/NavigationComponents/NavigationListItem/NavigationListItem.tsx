@@ -9,7 +9,7 @@ function NavigationListItem({ item }: NavigationListItemProps) {
 		button:
 			'group/navbtn px-5 py-2 font-semibold bg-amber-400 text-neutral-950 rounded-full shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:scale-105 hover:bg-amber-300 hover:shadow-[0_0_20px_rgba(251,191,36,0.5)] inline-flex items-center gap-2.5',
 		outline:
-			'px-5 py-2 border border-white/20 rounded-full hover:bg-amber-400 hover:text-neutral-950 hover:border-amber-400 inline-block',
+			'bg-white/80 px-5 py-2 border border-white/20 rounded-full hover:bg-amber-400 hover:text-neutral-950 hover:border-amber-400 inline-block',
 	}
 	return (
 		<li key={item.id}>
