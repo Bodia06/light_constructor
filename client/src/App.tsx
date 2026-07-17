@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router-dom'
 import AppLayout from './components/AppLayout/AppLayout'
 import HomePage from './pages/HomePage/HomePage'
 
