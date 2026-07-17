@@ -16,7 +16,7 @@ export default function CardInfo({ card }: HOME_CARD_PROPS) {
 			<div className='pt-4'>
 				<a
 					href={card.link}
-					className='group/btn relative px-8 py-4 bg-white text-neutral-950 font-semibold rounded-full overflow-hidden shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] inline-flex items-center'
+					className='group/btn relative px-8 py-4 bg-amber-400 text-neutral-950 font-semibold rounded-full overflow-hidden shadow-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,255,255,0.3)] inline-flex items-center'
 				>
 					<span className='absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000'></span>
 					<span className='relative z-10 flex items-center gap-3 text-base'>
