@@ -1,5 +1,17 @@
+import { Route, Routes } from 'react-router-dom'
+import AppLayout from './components/AppLayout/AppLayout'
+import HomePage from './pages/HomePage/HomePage'
+
 function App() {
-	return <></>
+	return (
+		<>
+			<Routes>
+				<Route path='/' element={<AppLayout />}>
+					<Route index element={<HomePage />} />
+				</Route>
+			</Routes>
+		</>
+	)
 }
 
 export default App

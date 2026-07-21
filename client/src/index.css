@@ -1,1 +1,27 @@
 @import 'tailwindcss';
+
+body {
+	font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-handwritten {
+	font-family: 'Segoe Script', 'Segoe Print', 'Caveat', cursive;
+}
+
+html {
+	scroll-behavior: smooth;
+}
+
+@keyframes drift-under {
+	0%,
+	100% {
+		transform: translateY(0) rotate(-1deg);
+	}
+	50% {
+		transform: translateY(2px) rotate(1deg);
+	}
+}
+
+.animate-drift-under {
+	animation: drift-under 2.5s infinite ease-in-out;
+}
